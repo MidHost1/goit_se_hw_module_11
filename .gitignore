@@ -1,0 +1,18 @@
+# envs
+.env
+
+# Python cache and venv
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+
+# logs + system files
+*.log
+.DS_Store
