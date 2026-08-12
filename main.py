@@ -36,7 +36,7 @@ def create_contact(contact: schemas.ContactCreate, db: Session = Depends(get_db)
 def get_contacts(
     skip: int = 0,
     limit: int = 100,
-    query: Optional[str] = Query(None, description="Пошук за ім'ям, прізвищем або поштою"),
+    query: Optional[str] = Query(None, description="Search by first name, last name or email"),
     db: Session = Depends(get_db)
 ):
     db_query = db.query(models.Contact)
