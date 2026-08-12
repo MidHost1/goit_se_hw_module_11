@@ -1,7 +1,8 @@
+from datetime import date, timedelta
 from typing import List, Optional
 from fastapi import Depends, FastAPI, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
+from sqlalchemy import or_, text
 
 import models
 import schemas
@@ -52,6 +53,19 @@ def get_contacts(
     contacts = db_query.offset(skip).limit(limit).all()
     return contacts
 
+@app.get("/contacts/upcoming-birthdays/", response_model=List[schemas.ContactResponse])
+def get_upcoming_birthdays(db: Session = Depends(get_db)):
+    today = date.today()
+    end_date = today + timedelta(days=7)
+    
+    contacts = db.query(models.Contact).filter(
+        text(
+            "TO_CHAR(birthday, 'MM-DD') BETWEEN TO_CHAR(:today, 'MM-DD') AND TO_CHAR(:end_date, 'MM-DD')"
+        )
+    ).params(today=today, end_date=end_date).all()
+    
+    return contacts
+
 @app.get("/contacts/{contact_id}", response_model=schemas.ContactResponse)
 def get_contact(contact_id: int, db: Session = Depends(get_db)):
     contact = db.query(models.Contact).filter(models.Contact.id == contact_id).first()
@@ -81,4 +95,3 @@ def delete_contact(contact_id: int, db: Session = Depends(get_db)):
     db.delete(contact)
     db.commit()
     return None
-
